@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feedback - Multi-Turn AI Chatbot</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body class="page-body feedback-body">
+  <div class="page-shell">
+    <!-- Feedback page navigation (same structure as the chat page sidebar). -->
+    <aside class="page-sidebar" id="feedback-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo"><span class="sidebar-mark">AI</span> Multi-Turn AI Chatbot</div>
+      </div>
+      <nav class="page-nav" aria-label="Main navigation">
+        <a class="menu-item" href="/chat">Chat</a>
+        <a class="menu-item feedback-menu-item active" href="/feedback" aria-current="page">Feedback</a>
+        <a class="menu-item analytics-menu-item" href="/analytics">Analytics</a>
+      </nav>
+
+      <!-- Signed-in user details and logout action. -->
+      <div class="sidebar-footer">
+        <div class="user-profile">
+          <img
+            class="user-avatar"
+            src="{{ user.get('picture', '') or 'https://ui-avatars.com/api/?name=User&background=111111&color=ffffff' }}"
+            alt="Profile"
+          />
+          <div class="user-info">
+            <span class="user-name">{{ user.get('name', 'User') }}</span>
+            <span class="user-email">{{ user.get('email', '') }}</span>
+          </div>
+        </div>
+        <a href="/auth/logout" class="btn-logout" title="Logout">Log out</a>
+      </div>
+    </aside>
+
+    <!-- Feedback form area. -->
+    <main class="page-main">
+      <!-- Chat-style header: page title on the left, feedback target on the right. -->
+      <header class="page-title-group feedback-topbar">
+        <div class="logo-icon">AI</div>
+        <div class="feedback-title-text">
+          <h1>Feedback</h1>
+          <p class="login-subtitle">Rate the chatbot response and share your thoughts.</p>
+        </div>
+        <span class="model-badge" id="feedback-target-badge">General feedback</span>
+      </header>
+
+      <div class="feedback-status page-alert" id="feedback-error" aria-live="polite"></div>
+
+      <!-- User rates one assistant message selected from the chat page. -->
+      <section class="feedback-panel" id="feedback-panel" aria-label="Feedback form">
+        <div class="feedback-header">Rate this response</div>
+
+        <div class="feedback-row">
+          <label>Rating</label>
+          <div class="star-rating" id="star-rating" role="group" aria-label="Star rating">
+            <button class="star" type="button" data-value="1" aria-label="1 star">★</button>
+            <button class="star" type="button" data-value="2" aria-label="2 stars">★</button>
+            <button class="star" type="button" data-value="3" aria-label="3 stars">★</button>
+            <button class="star" type="button" data-value="4" aria-label="4 stars">★</button>
+          </div>
+        </div>
+
+        <div class="feedback-row">
+          <label>Correctness</label>
+          <div class="btn-group" id="correctness-group">
+            <button class="toggle-btn" type="button" data-value="Correct">Correct</button>
+            <button class="toggle-btn" type="button" data-value="Partial">Partial</button>
+            <button class="toggle-btn" type="button" data-value="Incorrect">Incorrect</button>
+          </div>
+        </div>
+
+        <div class="feedback-row">
+          <label>Length</label>
+          <div class="btn-group" id="length-group">
+            <button class="toggle-btn" type="button" data-value="Short">Short</button>
+            <button class="toggle-btn" type="button" data-value="To the Point">To the Point</button>
+            <button class="toggle-btn" type="button" data-value="Lengthy">Lengthy</button>
+          </div>
+        </div>
+
+        <div class="feedback-row feedback-row-block">
+          <label for="feedback-comment">Comment</label>
+          <textarea id="feedback-comment" placeholder="Optional comment..." rows="3"></textarea>
+        </div>
+
+        <div class="feedback-actions">
+          <span class="feedback-status" id="feedback-status" aria-live="polite"></span>
+          <button class="btn-primary btn-submit-feedback" id="btn-submit-feedback" type="button">Submit Feedback</button>
+        </div>
+      </section>
+
+      <div class="page-actions">
+        <a href="/chat" class="btn-secondary">Back to Chat</a>
+      </div>
+    </main>
+  </div>
+
+  <script src="/static/js/feedback.js"></script>
+</body>
+</html>
