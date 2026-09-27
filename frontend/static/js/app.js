@@ -225,7 +225,11 @@ const app = {
   async handleSend() {
     const input = document.getElementById('message-input');
     const content = input.value.trim();
-    if (!content || app.isLoading || app.pendingFeedbackMessageId) return;
+    if (!content || app.isLoading) return;
+    if (app.pendingFeedbackMessageId) {
+      app.showMandatoryFeedback();
+      return;
+    }
 
     app.isLoading = true;
     input.value = '';
@@ -250,12 +254,12 @@ const app = {
       ui.appendMessage('assistant', `Error: ${err.message}. Please try again.`, null, new Date().toISOString());
     } finally {
       app.isLoading = false;
-      app.setComposerLocked(Boolean(app.pendingFeedbackMessageId));
-      if (!app.pendingFeedbackMessageId) input.focus();
+      app.setComposerLocked(false);
+      input.focus();
     }
   },
 
-  // FR12/FR13: freeze chat input after every assistant response until feedback is saved.
+  // FR12/FR13: track response feedback and require it before the next turn.
   requireFeedback(messageId) {
     app.pendingFeedbackMessageId = messageId;
     app.selectedRating = 0;
@@ -264,8 +268,10 @@ const app = {
     document.querySelectorAll('#chat-rating-group .star').forEach(star => star.classList.remove('active'));
     document.querySelectorAll('#mandatory-feedback .toggle-btn').forEach(btn => btn.classList.remove('selected'));
     document.getElementById('chat-feedback-status').textContent = '';
+  },
+
+  showMandatoryFeedback() {
     document.getElementById('mandatory-feedback').classList.remove('hidden');
-    // FR13: locked composer blocks new text input and send actions.
     app.setComposerLocked(true);
   },
 
