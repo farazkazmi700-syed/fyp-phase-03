@@ -175,7 +175,6 @@ const app = {
   // Register button, keyboard, logout, and input-resize actions for the chat page.
   bindEvents() {
     document.getElementById('btn-send').addEventListener('click', app.handleSend);
-    document.getElementById('btn-new-chat').addEventListener('click', () => app.startNewChat());
     document.getElementById('btn-logout')?.addEventListener('click', app.handleLogout);
     document.getElementById('btn-chat-feedback').addEventListener('click', app.submitMandatoryFeedback);
     document.getElementById('message-input').addEventListener('keydown', event => {
@@ -266,7 +265,7 @@ const app = {
     document.querySelectorAll('#mandatory-feedback .toggle-btn').forEach(btn => btn.classList.remove('selected'));
     document.getElementById('chat-feedback-status').textContent = '';
     document.getElementById('mandatory-feedback').classList.remove('hidden');
-    // FR13: locked composer blocks new text input, send, and new-chat actions.
+    // FR13: locked composer blocks new text input and send actions.
     app.setComposerLocked(true);
   },
 
@@ -274,7 +273,6 @@ const app = {
   setComposerLocked(locked) {
     document.getElementById('message-input').disabled = locked;
     document.getElementById('btn-send').disabled = locked || app.isLoading;
-    document.getElementById('btn-new-chat').disabled = locked;
   },
 
   // FR13: successful feedback completion unlocks chat input for the next turn.

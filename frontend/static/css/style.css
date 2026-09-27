@@ -123,6 +123,7 @@ textarea:focus-visible {
 .btn-secondary,
 .btn-icon,
 .btn-logout,
+.btn-login,
 .toggle-btn,
 .chip,
 .menu-item {
@@ -133,6 +134,7 @@ textarea:focus-visible {
 
 .btn-secondary:hover,
 .btn-icon:hover,
+.btn-login:hover,
 .toggle-btn:hover,
 .chip:hover,
 .menu-item:hover {
@@ -350,9 +352,59 @@ textarea:focus-visible {
 }
 
 .sidebar.collapsed {
-  width: 0;
-  min-width: 0;
-  transform: translateX(calc(-1 * var(--sidebar-w)));
+  width: 64px;
+  min-width: 64px;
+  transform: translateX(0);
+}
+
+.sidebar.collapsed .sidebar-logo,
+.sidebar.collapsed .sidebar-menu {
+  display: none;
+}
+
+.sidebar.collapsed .sidebar-header {
+  justify-content: center;
+  padding-inline: 8px;
+}
+
+.sidebar.collapsed .sidebar-footer,
+.page-sidebar.collapsed .sidebar-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+  padding: 12px 8px;
+  border-top: 1px solid var(--border);
+}
+
+.sidebar.collapsed .user-profile,
+.page-sidebar.collapsed .user-profile {
+  justify-content: center;
+  gap: 0;
+}
+
+.sidebar.collapsed .user-info,
+.page-sidebar.collapsed .user-info {
+  display: none;
+}
+
+.sidebar.collapsed .btn-logout,
+.sidebar.collapsed .btn-login,
+.page-sidebar.collapsed .btn-logout,
+.page-sidebar.collapsed .btn-login {
+  width: 40px;
+  height: 40px;
+  justify-content: center;
+  padding: 8px;
+}
+
+.sidebar.collapsed .btn-logout span,
+.sidebar.collapsed .btn-login span,
+.page-sidebar.collapsed .btn-logout span,
+.page-sidebar.collapsed .btn-login span {
+  display: none;
 }
 
 .sidebar-header,
@@ -370,6 +422,30 @@ textarea:focus-visible {
   justify-content: space-between;
   gap: 12px;
   padding: 12px 16px;
+}
+
+.sidebar-header-toggle {
+  width: 40px;
+  padding: 8px;
+}
+
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  visibility: hidden;
+  background: rgba(0, 0, 0, 0.62);
+  opacity: 0;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.sidebar-backdrop.visible {
+  visibility: visible;
+  opacity: 1;
+}
+
+body.sidebar-open {
+  overflow: hidden;
 }
 
 .sidebar-logo {
@@ -403,6 +479,15 @@ textarea:focus-visible {
   padding: 10px 12px;
   color: var(--muted);
   font-weight: 700;
+  transition: border-color 0.16s ease, background 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+.sidebar-menu .menu-item:not(.active):hover,
+.page-nav .menu-item:not(.active):hover {
+  transform: translateX(3px);
+  border-color: var(--blue);
+  background: var(--blue-soft);
+  color: var(--text);
 }
 
 .menu-item.active {
@@ -412,6 +497,12 @@ textarea:focus-visible {
 }
 
 .feedback-menu-item {
+  border-color: var(--border);
+  background: var(--panel);
+  color: var(--muted);
+}
+
+.feedback-menu-item.active {
   border-color: var(--purple);
   background: var(--purple-soft);
   color: var(--white);
@@ -456,6 +547,18 @@ textarea:focus-visible {
 .btn-logout {
   flex: 0 0 auto;
   padding: 8px 10px;
+}
+
+.btn-logout,
+.btn-login {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-logout svg,
+.btn-login svg {
+  flex: 0 0 auto;
 }
 
 .btn-logout:hover {
@@ -765,12 +868,51 @@ textarea:focus-visible {
   min-height: 100vh;
 }
 
+/* Shared sidebar for the Feedback and Analytics pages. It mirrors the chat page
+   sidebar: a pinned, full-height column so the "Multi-Turn AI Chatbot"
+   navigation header remains on screen on every page while the page content
+   scrolls (the chat page achieves the same by scrolling only its messages). */
 .page-sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
   width: var(--sidebar-w);
   min-width: var(--sidebar-w);
+  height: 100vh;
+  flex-direction: column;
+  overflow-y: auto;
   border-right: 1px solid var(--border);
   background: var(--glass);
   backdrop-filter: none;
+  transition: width 0.2s ease, min-width 0.2s ease;
+}
+
+.page-sidebar.collapsed {
+  width: 64px;
+  min-width: 64px;
+  transform: translateX(0);
+  overflow: hidden;
+}
+
+.page-sidebar.collapsed .sidebar-logo,
+.page-sidebar.collapsed .page-nav {
+  display: none;
+}
+
+.page-sidebar.collapsed .sidebar-header {
+  justify-content: center;
+  padding-inline: 8px;
+}
+
+/* Keep the branding row pinned to the top of the sidebar's own scroll area,
+   so the app name stays visible even on short viewports. Desktop only: the
+   stacked mobile layout (<= 820px) keeps the sidebar out of the viewport. */
+@media (min-width: 821px) {
+  .page-sidebar .sidebar-header {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+  }
 }
 
 .page-main {
@@ -966,23 +1108,83 @@ textarea:focus-visible {
 @media (max-width: 820px) {
   .chat-body,
   .page-shell {
-    flex-direction: column;
+    flex-direction: row;
   }
 
-  .sidebar {
-    position: relative;
-    width: 100%;
-    min-width: 0;
-    height: auto;
-    border-right: 0;
-    border-bottom: 1px solid var(--border);
-  }
-
+  .sidebar,
   .page-sidebar {
-    width: 100%;
-    min-width: 0;
-    border-right: 0;
-    border-bottom: 1px solid var(--border);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 40;
+    width: 64px;
+    min-width: 64px;
+    height: 100vh;
+    height: 100dvh;
+    transform: translateX(0);
+    border-right: 1px solid var(--border);
+    border-bottom: 0;
+    transition: transform 0.22s ease;
+  }
+
+  .sidebar.mobile-open,
+  .page-sidebar.mobile-open {
+    width: min(var(--sidebar-w), 86vw);
+    min-width: min(var(--sidebar-w), 86vw);
+    transform: translateX(0);
+  }
+
+  .sidebar:not(.mobile-open) .sidebar-logo,
+  .sidebar:not(.mobile-open) .sidebar-menu,
+  .page-sidebar:not(.mobile-open) .sidebar-logo,
+  .page-sidebar:not(.mobile-open) .page-nav {
+    display: none;
+  }
+
+  .sidebar:not(.mobile-open) .sidebar-header,
+  .page-sidebar:not(.mobile-open) .sidebar-header {
+    justify-content: center;
+    padding-inline: 8px;
+  }
+
+  .sidebar:not(.mobile-open) .sidebar-footer,
+  .page-sidebar:not(.mobile-open) .sidebar-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: auto;
+    padding: 12px 8px;
+    border-top: 1px solid var(--border);
+  }
+
+  .sidebar:not(.mobile-open) .user-profile,
+  .page-sidebar:not(.mobile-open) .user-profile {
+    justify-content: center;
+    gap: 0;
+  }
+
+  .sidebar:not(.mobile-open) .user-info,
+  .page-sidebar:not(.mobile-open) .user-info {
+    display: none;
+  }
+
+  .sidebar:not(.mobile-open) .btn-logout,
+  .sidebar:not(.mobile-open) .btn-login,
+  .page-sidebar:not(.mobile-open) .btn-logout,
+  .page-sidebar:not(.mobile-open) .btn-login {
+    width: 40px;
+    height: 40px;
+    justify-content: center;
+    padding: 8px;
+  }
+
+  .sidebar:not(.mobile-open) .btn-logout span,
+  .sidebar:not(.mobile-open) .btn-login span,
+  .page-sidebar:not(.mobile-open) .btn-logout span,
+  .page-sidebar:not(.mobile-open) .btn-login span {
+    display: none;
   }
 
   .sidebar-header,
@@ -993,16 +1195,15 @@ textarea:focus-visible {
 
   .sidebar-menu,
   .page-nav {
-    flex-direction: row;
+    flex-direction: column;
     gap: 8px;
-    overflow-x: auto;
     padding: 10px 14px;
   }
 
   .menu-item {
-    flex: 1;
-    justify-content: center;
-    min-width: 120px;
+    width: 100%;
+    justify-content: flex-start;
+    min-width: 0;
   }
 
   .sidebar-footer {
@@ -1010,7 +1211,16 @@ textarea:focus-visible {
   }
 
   .chat-main {
-    min-height: calc(100vh - 168px);
+    width: calc(100% - 64px);
+    min-width: 0;
+    min-height: 100vh;
+    margin-left: 64px;
+  }
+
+  .page-main,
+  .analytics-main {
+    width: calc(100% - 64px);
+    margin-left: 64px;
   }
 
   .chat-header {
@@ -1043,11 +1253,6 @@ textarea:focus-visible {
 
   .login-container {
     margin: auto;
-  }
-
-  .sidebar {
-    width: 100%;
-    min-width: 100%;
   }
 
   .messages-container {
@@ -1141,9 +1346,9 @@ textarea:focus-visible {
 
 /* ---- Analytics nav badge ---- */
 .analytics-menu-item {
-  border-color: var(--cyan, #06B6D4);
-  background: rgba(6, 182, 212, 0.12);
-  color: var(--white);
+  border-color: var(--border);
+  background: var(--panel);
+  color: var(--muted);
 }
 
 .analytics-menu-item.active {
@@ -1550,6 +1755,14 @@ code.session-id {
 
 /* ---- Analytics responsive breakpoints ---- */
 @media (max-width: 820px) {
+  /* Keep analytics navigation in the same mobile drawer as chat and feedback. */
+  .analytics-body .page-sidebar {
+    position: fixed;
+    height: 100vh;
+    height: 100dvh;
+    overflow-y: auto;
+  }
+
   .analytics-header {
     flex-direction: column;
     align-items: flex-start;
@@ -1621,16 +1834,9 @@ code.session-id {
   --fb-star-font: clamp(21px, 2.2vw, 26px);       /* star glyph size */
 }
 
-/* Sidebar mirrors the chat page: sticky column with a pinned user footer. */
-.feedback-body .page-sidebar {
-  position: sticky;
-  top: 0;
-  display: flex;
-  height: 100vh;
-  flex-direction: column;
-  overflow-y: auto;
-}
-
+/* Sidebar mirrors the chat page: pinned column with a pinned user footer. The
+   pinned, full-height column itself comes from the shared .page-sidebar rule
+   above, so the "Multi-Turn AI Chatbot" header stays on screen here too. */
 .feedback-body .sidebar-footer {
   margin-top: auto;
 }
@@ -1835,13 +2041,14 @@ code.session-id {
 /* ---- Feedback page responsive breakpoints ---- */
 @media (max-width: 820px) {
   .feedback-body .page-sidebar {
-    position: static;
-    height: auto;
-    overflow: visible;
+    position: fixed;
+    height: 100vh;
+    height: 100dvh;
+    overflow-y: auto;
   }
 
   .feedback-body .sidebar-footer {
-    margin-top: 0;
+    margin-top: auto;
     flex-direction: row;
     align-items: center;
   }
@@ -1898,4 +2105,50 @@ code.session-id {
     align-items: flex-start;
   }
 }
+
+@media (min-width: 821px) {
+  .analytics-main {
+    gap: clamp(18px, 1.8vw, 28px);
+    padding: clamp(24px, 2.2vw, 40px);
+  }
+
+  .analytics-header {
+    gap: clamp(20px, 2vw, 28px);
+    padding-bottom: clamp(16px, 1.6vw, 24px);
+  }
+
+  .kpi-grid,
+  .charts-grid,
+  .tables-grid {
+    gap: clamp(16px, 1.4vw, 24px);
+  }
+
+  .an-section-title {
+    margin-top: clamp(8px, 0.8vw, 12px);
+    margin-bottom: 0;
+    padding-bottom: 12px;
+  }
+
+  .feedback-body .page-main {
+    max-width: none;
+    gap: clamp(18px, 1.8vw, 28px);
+    padding: clamp(24px, 2.2vw, 40px);
+  }
+
+  .feedback-body .feedback-topbar,
+  .feedback-body .page-alert,
+  .feedback-body .feedback-panel,
+  .feedback-body .page-actions {
+    width: 100%;
+    max-width: none;
+  }
+
+  .feedback-body .feedback-panel {
+    padding: clamp(24px, 2.2vw, 36px) clamp(24px, 2.4vw, 40px);
+  }
+}
+
+
+
+
 

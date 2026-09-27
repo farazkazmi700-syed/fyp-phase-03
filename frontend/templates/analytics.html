@@ -22,15 +22,19 @@
          ================================================================ -->
     <aside class="page-sidebar" id="an-sidebar">
       <div class="sidebar-header">
-        <div class="sidebar-logo">
-          <span class="sidebar-mark">AI</span> Multi-Turn AI Chatbot
-        </div>
+        <div class="sidebar-logo">Multi-Turn AI Chatbot</div>
+        <button class="btn-icon btn-sidebar-toggle sidebar-header-toggle" id="btn-sidebar-header-toggle" type="button" title="Toggle navigation" aria-label="Toggle navigation" aria-expanded="true" aria-controls="an-sidebar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
       </div>
-
       <nav class="page-nav" aria-label="Main navigation">
+        <a class="menu-item analytics-menu-item active" href="/analytics" aria-current="page">Analytics</a>
         <a class="menu-item" href="/chat">Chat</a>
         <a class="menu-item feedback-menu-item" href="/feedback">Feedback</a>
-        <a class="menu-item analytics-menu-item active" href="/analytics">Analytics</a>
       </nav>
 
       <!-- Signed-in user info -->
@@ -39,25 +43,45 @@
           <img
             class="user-avatar"
             src="{{ user.get('picture', '') or 'https://ui-avatars.com/api/?name=User&background=111111&color=ffffff' }}"
-            alt="Profile"
+            alt="{{ user.get('name', 'User') }} profile"
+            title="{{ user.get('name', 'User') }} ({{ user.get('email', '') }})"
           />
           <div class="user-info">
             <span class="user-name">{{ user.get('name', 'User') }}</span>
             <span class="user-email">{{ user.get('email', '') }}</span>
           </div>
         </div>
-        <a href="/auth/logout" class="btn-logout" title="Logout">Log out</a>
+        {% if user.get('id') %}
+        <a href="/auth/logout" class="btn-logout" title="Log out" aria-label="Log out">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M10 17l5-5-5-5"></path>
+            <path d="M15 12H3"></path>
+            <path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"></path>
+          </svg>
+          <span>Log out</span>
+        </a>
+        {% else %}
+        <a href="/login" class="btn-login" title="Log in" aria-label="Log in">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M14 17l5-5-5-5"></path>
+            <path d="M19 12H9"></path>
+            <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7"></path>
+          </svg>
+          <span>Log in</span>
+        </a>
+        {% endif %}
       </div>
     </aside>
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
     <!-- ================================================================
          Main analytics content area
          ================================================================ -->
-    <main class="analytics-main" id="analytics-main">
+    <main class="analytics-main" id="analytics-main" tabindex="-1">
 
       <!-- Page header -->
-      <header class="analytics-header">
-        <div class="analytics-title-group">
+      <header class="chat-header analytics-header">
+        <div class="chat-title analytics-title-group">
           <div class="analytics-icon">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <line x1="18" y1="20" x2="18" y2="10"></line>
@@ -205,29 +229,6 @@
             </div>
           </div>
 
-          <!-- FR19: Reply correctness table -->
-          <div class="table-card">
-            <div class="table-card-title">Reply Correctness</div>
-            <div class="table-scroll">
-              <table id="tbl-reply-corr" class="an-table" aria-label="Reply correctness table">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Time</th>
-                    <th>Session</th>
-                    <th>Topic</th>
-                    <th>Phase</th>
-                    <th>Correctness</th>
-                    <th>Accuracy</th>
-                    <th>Rating</th>
-                    <th>Length</th>
-                  </tr>
-                </thead>
-                <tbody id="tbl-reply-corr-body"></tbody>
-              </table>
-            </div>
-          </div>
-
           <!-- FR19: Phase-wise accuracy table -->
           <div class="table-card">
             <div class="table-card-title">Phase-wise Accuracy</div>
@@ -316,6 +317,28 @@
           </div>
         </div>
 
+        <div class="an-section-title">Reply Correctness</div>
+        <div class="table-card full-width">
+          <div class="table-scroll">
+            <table id="tbl-reply-corr" class="an-table" aria-label="Reply correctness table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Time</th>
+                  <th>Session</th>
+                  <th>Topic</th>
+                  <th>Phase</th>
+                  <th>Correctness</th>
+                  <th>Accuracy</th>
+                  <th>Rating</th>
+                  <th>Length</th>
+                </tr>
+              </thead>
+              <tbody id="tbl-reply-corr-body"></tbody>
+            </table>
+          </div>
+        </div>
+
       </section><!-- /an-content -->
 
       <!-- FR22: End-session confirmation toast -->
@@ -324,6 +347,7 @@
     </main>
   </div><!-- /page-shell -->
 
+  <script src="/static/js/navigation.js"></script>
   <script src="/static/js/analytics.js"></script>
 </body>
 </html>
